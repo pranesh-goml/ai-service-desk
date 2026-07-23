@@ -5,7 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel,Field
 from app.models.ticket_model import PriorityEnum, StatusEnum
 class TicketInSchema(BaseModel):
-    title: str
+    title: str= Field(...,min_length=1,description="Title of the ticket")
     priority: PriorityEnum
     status: StatusEnum
     class Config:

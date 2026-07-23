@@ -18,7 +18,6 @@ class StatusEnum(str, PyEnum):
     IN_PROGRESS = "In-Progress"
     RESOLVED = "Resolved"
     CLOSED = "Closed"
-
 class Ticket(Base):
     __tablename__ = "ticket"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
