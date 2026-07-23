@@ -18,7 +18,7 @@ class TestCreateTicket:
             {
                 "title": "VPN Issue",
                 "priority": PriorityEnum.MEDIUM.value,
-                "status": StatusEnum.IN_PROGRESS.value,
+                "status": StatusEnum.OPEN.value,
             },
             {
                 "title": "Printer Error",
@@ -88,3 +88,31 @@ class TestCreateTicket:
         second = await client.post("/tickets/ticket", json=payload)
 
         assert second.status_code == 409
+
+    @pytest.mark.parametrize(
+        "payload",
+        [
+            {
+                "title": "VPN Issue",
+                "priority": PriorityEnum.MEDIUM.value,
+                "status": StatusEnum.IN_PROGRESS.value,
+            },
+            {
+                "title": "Printer Error",
+                "priority": PriorityEnum.LOW.value,
+                "status": StatusEnum.CLOSED.value,
+            },
+            {
+                "title": "Database Issue",
+                "priority": PriorityEnum.HIGH.value,
+                "status": StatusEnum.RESOLVED.value,
+            },
+        ],
+    )
+    async def test_create_ticket_invalid_initial_status(
+        self,
+        client: AsyncClient,
+        payload,
+    ):
+        response = await client.post("/tickets/ticket", json=payload)
+        assert response.status_code == 400

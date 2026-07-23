@@ -10,10 +10,15 @@ from app.service.aws.bedrock_service import (
 
 router = APIRouter(prefix="/ai", tags=["AI"])
 
+def get_bedrock_service() -> BedrockService:
+    return BedrockService()
+
 @router.post("/summarize", response_model=SummarizeResponse)
-def summarize_ticket(payload: SummarizeRequest) -> dict[str, str]:
+def summarize_ticket(
+    payload: SummarizeRequest,
+    service: BedrockService = Depends(get_bedrock_service),
+) -> dict[str, str]:
     try:
-        service=BedrockService()
         return service.summarize_ticket(payload.ticket_description)
     except BedrockServiceError as exc:
         raise HTTPException(

@@ -165,12 +165,20 @@ class TestUpdateTicket:
         client: AsyncClient,
         closed_ticket,
     ):
+        create_payload = closed_ticket.copy()
+        create_payload["status"] = StatusEnum.OPEN.value
         create = await client.post(
             "/tickets/ticket",
-            json=closed_ticket,
+            json=create_payload,
         )
 
         ticket = create.json()["ticket"]
+
+        update_closed = await client.put(
+            f"/tickets/ticket/{ticket['id']}",
+            json=closed_ticket
+        )
+        assert update_closed.status_code == 200
 
         response = await client.put(
             f"/tickets/ticket/{ticket['id']}",

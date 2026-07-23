@@ -24,6 +24,18 @@ class TicketRepository:
 
         return result.scalar_one_or_none()
 
+    async def get_ticket_by_title(self, title: str) -> Ticket | None:
+        result = await self.db.execute(
+            select(Ticket).where(Ticket.title == title)
+        )
+        return result.scalar_one_or_none()
+
+    async def get_ticket_by_title_exclude_id(self, title: str, exclude_id: UUID) -> Ticket | None:
+        result = await self.db.execute(
+            select(Ticket).where(Ticket.title == title, Ticket.id != exclude_id)
+        )
+        return result.scalar_one_or_none()
+
     async def get_all(self,status:str|None=None,priority:str|None=None):
         query=select(Ticket)
         if status:

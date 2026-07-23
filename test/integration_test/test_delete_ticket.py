@@ -27,11 +27,20 @@ class TestDeleteTicket:
         client: AsyncClient,
         payload,
     ):
-        create = await client.post("/tickets/ticket", json=payload)
+        create_payload = payload.copy()
+        create_payload["status"] = StatusEnum.OPEN.value
+        create = await client.post("/tickets/ticket", json=create_payload)
 
         assert create.status_code == 201
 
         ticket = create.json()["ticket"]
+
+        if payload["status"] != StatusEnum.OPEN.value:
+            update = await client.put(
+                f"/tickets/ticket/{ticket['id']}",
+                json=payload
+            )
+            assert update.status_code == 200
 
         response = await client.delete(f"/tickets/ticket/{ticket['id']}")
 

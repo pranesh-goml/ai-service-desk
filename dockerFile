@@ -1,25 +1,32 @@
+FROM astral-sh/uv:python3.13-slim AS builder
+
+WORKDIR /app
+
+# Enable bytecode compilation for faster startup and leaner builds
+ENV UV_COMPILE_BYTECODE=1
+
+# Copy dependency metadata first so Docker can cache the install layer
+COPY pyproject.toml ./
+
+# Install runtime dependencies from pyproject metadata
+RUN --mount=type=cache,target=/root/.cache/uv \
+	uv sync --no-install-project --no-dev
+
+# Copy application code and install the project itself
+COPY . .
+RUN --mount=type=cache,target=/root/.cache/uv \
+	uv sync --no-dev
+
 FROM python:3.13-slim
 
 WORKDIR /app
 
+COPY --from=builder /app /app
 
-# Install uv
-RUN pip install uv
-
-
-# Copy dependency files
-COPY pyproject.toml uv.lock ./
-
-
-# Install dependencies
-RUN uv sync --frozen
-
-
-# Copy application code
-COPY . .
-
+ENV PATH="/app/.venv/bin:$PATH" \
+	PYTHONUNBUFFERED=1 \
+	PYTHONDONTWRITEBYTECODE=1
 
 EXPOSE 8000
 
-
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -27,7 +27,25 @@ os.environ["ENV_FILE"] = ".env.test"
 
 from app.main import app
 from app.core.deps import get_db
-from app.core.database import asyncSessionLocal
+from app.core.database import asyncSessionLocal, engine, Base
+from app.models.ticket_model import Ticket
+import asyncio
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_test_db():
+    async def _setup():
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
+            await conn.run_sync(Base.metadata.create_all)
+
+    asyncio.run(_setup())
+    yield
+    
+    async def _teardown():
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
+            
+    asyncio.run(_teardown())
 
 # ----------------------------------------------------
 # Database Session Fixture

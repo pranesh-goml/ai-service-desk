@@ -35,8 +35,18 @@ class TestGetAllTickets:
         tickets,
     ):
         for ticket in tickets:
-            response = await client.post("/tickets/ticket", json=ticket)
+            create_payload = ticket.copy()
+            create_payload["status"] = StatusEnum.OPEN.value
+            response = await client.post("/tickets/ticket", json=create_payload)
             assert response.status_code == 201
+
+            if ticket["status"] != StatusEnum.OPEN.value:
+                created_ticket = response.json()["ticket"]
+                update_response = await client.put(
+                    f"/tickets/ticket/{created_ticket['id']}",
+                    json=ticket
+                )
+                assert update_response.status_code == 200
 
         response = await client.get("/tickets/ticket")
 

@@ -20,18 +20,18 @@ class TestCreateTicket:
             TicketInSchema(
                 title="Printer Error",
                 priority=PriorityEnum.MEDIUM,
-                status=StatusEnum.IN_PROGRESS,
+                status=StatusEnum.OPEN,
             ),
             TicketInSchema(
                 title="VPN Issue",
                 priority=PriorityEnum.LOW,
-                status=StatusEnum.CLOSED,
+                status=StatusEnum.OPEN,
             ),
         ],
     )
     async def test_create_ticket_success(self, payload):
         repo = AsyncMock()
-
+        repo.get_ticket_by_title.return_value = None
         repo.create_ticket.return_value = payload
 
         service = TicketService(repo)
@@ -56,9 +56,37 @@ class TestCreateTicket:
         )
 
         repo = AsyncMock()
+        repo.get_ticket_by_title.return_value = None
         repo.create_ticket.side_effect = exception
 
         service = TicketService(repo)
 
         with pytest.raises(type(exception)):
             await service.create_ticket(payload)
+
+    @pytest.mark.parametrize(
+        "payload",
+        [
+            TicketInSchema(
+                title="Printer Error",
+                priority=PriorityEnum.MEDIUM,
+                status=StatusEnum.IN_PROGRESS,
+            ),
+            TicketInSchema(
+                title="VPN Issue",
+                priority=PriorityEnum.LOW,
+                status=StatusEnum.CLOSED,
+            ),
+        ],
+    )
+    async def test_create_ticket_invalid_status_raises_http_exception(self, payload):
+        repo = AsyncMock()
+        repo.get_ticket_by_title.return_value = None
+        service = TicketService(repo)
+
+        from fastapi import HTTPException
+        with pytest.raises(HTTPException) as exc_info:
+            await service.create_ticket(payload)
+
+        assert exc_info.value.status_code == 400
+        assert exc_info.value.detail == "A Ticket can be raised only as a Open ticket."

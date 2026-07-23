@@ -38,6 +38,7 @@ class TestUpdateTicket:
         mock_ticket = AsyncMock()
         mock_ticket.status = StatusEnum.OPEN
         repo.get_ticket_by_id.return_value = mock_ticket
+        repo.get_ticket_by_title_exclude_id.return_value = None
         repo.update_ticket.return_value = payload
 
         service = TicketService(repo)
@@ -91,6 +92,10 @@ class TestUpdateTicket:
         )
 
         repo = AsyncMock()
+        mock_ticket = AsyncMock()
+        mock_ticket.status = StatusEnum.OPEN
+        repo.get_ticket_by_id.return_value = mock_ticket
+        repo.get_ticket_by_title_exclude_id.return_value = None
         repo.update_ticket.side_effect = exception
 
         service = TicketService(repo)

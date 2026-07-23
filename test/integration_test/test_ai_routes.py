@@ -21,7 +21,7 @@ class TestAIRoutes:
             "ticket_description": "The system keeps throwing a 500 error when I try to save the user profile. Please help fix it."
         }
         response = await client.post("/ai/summarize", json=payload)
-        
+
         # Clear override
         app.dependency_overrides.pop(get_bedrock_service, None)
 
@@ -47,7 +47,7 @@ class TestAIRoutes:
             "ticket_description": "The system keeps throwing a 500 error when I try to save the user profile. Please help fix it."
         }
         response = await client.post("/ai/summarize", json=payload)
-        
+
         # Clear override
         app.dependency_overrides.pop(get_bedrock_service, None)
 
