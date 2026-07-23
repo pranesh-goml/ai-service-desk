@@ -1,0 +1,27 @@
+# Git
+.git
+.gitignore
+
+# Python caching & environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+ENV/
+
+# Development environments and configs
+.env
+.env.test
+.idea/
+.vscode/
+.junie/
+.pytest_cache/
+.agents/
+
+# Docker configuration
+Dockerfile
+Dockerfile
+.dockerignore
