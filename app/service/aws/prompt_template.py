@@ -1,25 +1,19 @@
-from __future__ import annotations
+import os
+import yaml
+from jinja2 import Template
 
-from dataclasses import dataclass
+class PromptLoader:
+    def render(self, prompt_name: str, **kwargs) -> str:
+        # Resolve path to prompts.yaml in the same directory as this file
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        prompts_path = os.path.join(base_dir, "prompts.yaml")
+        try:
+            with open(prompts_path, "r", encoding="utf-8") as f:
+                prompts = yaml.safe_load(f)
+        except FileNotFoundError:
+            # Fallback to current working directory
+            with open("prompts.yaml", "r", encoding="utf-8") as f:
+                prompts = yaml.safe_load(f)
 
-
-@dataclass(frozen=True)
-class PromptTemplate:
-    name: str
-    version: str
-    template: str
-
-    def render(self, **values: str) -> str:
-        return self.template.format(**values)
-
-
-TICKET_SUMMARY_V1 = PromptTemplate(
-    name="ticket_summary",
-    version="1.0.0",
-    template=(
-        "Return only valid JSON with keys summary and suggested_response. "
-        "Summarize the following support ticket and suggest a concise, "
-        "professional response. Ticket: {ticket_description}"
-
-    ),
-)
+        template = Template(prompts[prompt_name]["user"])
+        return template.render(**kwargs)

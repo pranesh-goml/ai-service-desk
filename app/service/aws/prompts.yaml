@@ -1,0 +1,38 @@
+ticket_summary:
+  user: |
+    You are an AI support assistant for a service desk. Analyze the incoming support ticket or query in the context of the existing tickets list.
+
+    Existing Tickets:
+    {{ ticket_list }}
+
+    Incoming Ticket or User Query:
+    {{ ticket_description }}
+
+    Instructions:
+    1. If the incoming text is a user query or question asking about existing tickets (e.g. list, counts, status, priorities, duplicates, or specific issues), answer the query using the information in the Existing Tickets list.
+    2. If the incoming text is a standard support ticket, summarize it and suggest a professional response, leveraging the context of any similar existing tickets.
+    3. You MUST return your response in a single, valid JSON object with exactly two keys: "summary" and "suggested_response". Do not include markdown code block formatting (such as ```json or ```).
+
+    Required JSON Output Format:
+    {
+      "summary": "Brief summary of the incoming ticket or user query.",
+      "suggested_response": "The professional response answering the request, referencing existing tickets if relevant."
+    }
+
+generate_description:
+  user: |
+    Generate a professional ticket description.
+
+    Title: {{ title }}
+    Priority: {{ priority }}
+    Status: {{ status }}
+
+    Rules:
+    - Return ONLY the description.
+    - Do not use Markdown.
+    - Do not use headings.
+    - Do not use bullet points.
+    - Do not use code blocks.
+    - Do not mention the word count.
+    - Do not include labels like "Description".
+    - Return exactly one paragraph between 40 and 50 words.

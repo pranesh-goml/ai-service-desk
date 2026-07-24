@@ -10,8 +10,10 @@ class TicketRepository:
     def __init__(self,db: AsyncSession):
         self.db = db
 
-    async def create_ticket(self,payload: TicketInSchema):
-        ticket = Ticket(**payload.model_dump())
+    async def create_ticket(self, payload: TicketInSchema, description: str):
+        data = payload.model_dump()
+        data["description"] = description
+        ticket = Ticket(**data)
         self.db.add(ticket)
         await self.db.flush()
         await self.db.refresh(ticket)

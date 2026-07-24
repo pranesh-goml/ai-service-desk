@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, ANY
 
 from app.models.ticket_model import PriorityEnum, StatusEnum
 from app.schemas.ticket_schema import TicketInSchema
@@ -38,7 +38,7 @@ class TestCreateTicket:
 
         result = await service.create_ticket(payload)
 
-        repo.create_ticket.assert_awaited_once_with(payload)
+        repo.create_ticket.assert_awaited_once_with(payload, ANY)
         assert result == payload
 
     @pytest.mark.parametrize(

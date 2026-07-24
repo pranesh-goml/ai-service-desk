@@ -24,5 +24,6 @@ class Ticket(Base):
     title = Column(String, nullable=False)
     priority = Column(Enum(PriorityEnum,name="priority_enum"), nullable=False)
     status = Column(Enum(StatusEnum,name="status_enum"), nullable=False)
+    description = Column(String, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())

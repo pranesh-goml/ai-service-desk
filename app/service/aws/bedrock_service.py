@@ -6,9 +6,8 @@ from typing import Any
 
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
-
-from app.service.aws.prompt_template import TICKET_SUMMARY_V1
-
+from app.schemas.ticket_schema import TicketInSchema
+from app.service.aws.prompt_template import PromptLoader
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -36,10 +35,13 @@ class BedrockService:
             aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
             region_name=os.getenv("AWS_REGION"),
         )
+        self.prompt_loader = PromptLoader()
 
-    def summarize_ticket(self, ticket_description: str) -> dict[str, str]:
-        prompt = TICKET_SUMMARY_V1.render(
+    def summarize_ticket(self, ticket_description: str, ticket_list: str = "") -> dict[str, str]:
+        prompt = self.prompt_loader.render(
+            "ticket_summary",
             ticket_description=ticket_description,
+            ticket_list=ticket_list,
         )
         try:
             response = self.client.converse(
@@ -56,32 +58,81 @@ class BedrockService:
                 },
             )
         except (BotoCoreError, ClientError) as exc:
+            print(f"AWS Bedrock client error during converse call: {exc}")
             raise BedrockServiceError("Bedrock request failed") from exc
 
         try:
-            print(response)
+            print("--- Bedrock Raw Response Output ---")
             text = response["output"]["message"]["content"][0]["text"]
+            print(text)
+            print("-----------------------------------")
             text = text.strip()
+            
             if text.startswith("```"):
                 text = "\n".join(line for line in text.splitlines()[1:] if not line.strip().startswith("```"))
                 text = text.strip()
-            parsed = json.loads(text)
+            
+            parsed = None
+            try:
+                parsed = json.loads(text)
+            except json.JSONDecodeError:
+                # Attempt to extract JSON using { } boundaries
+                start_idx = text.find("{")
+                end_idx = text.rfind("}")
+                if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                    try:
+                        parsed = json.loads(text[start_idx:end_idx+1])
+                    except json.JSONDecodeError:
+                        pass
+            
+            # If still not parsed, treat the entire output as the response
+            if not parsed or not isinstance(parsed, dict):
+                parsed = {
+                    "summary": "AI Desk Response",
+                    "suggested_response": text
+                }
 
-            print("############")
-            print(text)
-            print("############")
             return {
-                "summary": str(parsed["summary"]),
-                "suggested_response": str(parsed["suggested_response"]),
+                "summary": str(parsed.get("summary", "AI Desk Response")),
+                "suggested_response": str(parsed.get("suggested_response", text)),
             }
-        except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
+        except Exception as exc:
+            print(f"Error parsing Bedrock response: {exc}")
             raise BedrockServiceError("Bedrock returned an invalid response") from exc
+    def generate_description(self, ticket_input: TicketInSchema) -> str:
+        prompt = self.prompt_loader.render(
+            "generate_description",
+            title=ticket_input.title,
+            priority=ticket_input.priority,
+            status=ticket_input.status,
+        )
 
+        try:
+            response = self.client.converse(
+                modelId=self.model_id,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [{"text": prompt}],
+                    }
+                ],
+                inferenceConfig={
+                    "maxTokens": 100,
+                    "temperature": 0.1,
+                },
+            )
+        except (BotoCoreError, ClientError) as exc:
+            raise BedrockServiceError("Bedrock request failed") from exc
+
+        try:
+            return response["output"]["message"]["content"][0]["text"].strip()
+        except (KeyError, IndexError, TypeError) as exc:
+            raise BedrockServiceError("Invalid Bedrock response") from exc
 
 class FakeBedrockService:
     """Offline deterministic implementation for classroom demonstrations."""
 
-    def summarize_ticket(self, ticket_description: str) -> dict[str, str]:
+    def summarize_ticket(self, ticket_description: str, ticket_list: str = "") -> dict[str, str]:
         short_description = ticket_description.strip()[:70]
         return {
             "summary": f"Support issue: {short_description}",

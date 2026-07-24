@@ -24,6 +24,7 @@ class TicketSchema(BaseModel):
     title: str
     priority: str
     status: str
+    description: str
     created_at: datetime
     updated_at: datetime
 

@@ -9,7 +9,7 @@ from app.models.ticket_model import StatusEnum
 from app.repositories.ticket_repo import TicketRepository
 from app.schemas.ticket_schema import TicketInSchema
 from app.core.exceptions import ClosedTicketError, DuplicateTicketError
-
+from app.service.aws.bedrock_service import BedrockService
 
 class TicketService:
     def __init__(self, repo: TicketRepository):
@@ -21,7 +21,9 @@ class TicketService:
             raise DuplicateTicketError("Ticket with this title already exists")
         if ticket_input.status != StatusEnum.OPEN:
             raise HTTPException(status_code=400,detail="A Ticket can be raised only as a Open ticket.")
-        return await self.repo.create_ticket(ticket_input)
+        bedrock = BedrockService()
+        description = bedrock.generate_description(ticket_input)
+        return await self.repo.create_ticket(ticket_input,description)
 
     async def get_all_tickets(self, status=None, priority=None):
         return await self.repo.get_all(status=status, priority=priority)

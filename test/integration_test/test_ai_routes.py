@@ -6,7 +6,7 @@ from app.service.aws.bedrock_service import FakeBedrockService, BedrockServiceEr
 
 
 class MockErrorBedrockService:
-    def summarize_ticket(self, ticket_description: str) -> dict[str, str]:
+    def summarize_ticket(self, ticket_description: str, ticket_list: str = "") -> dict[str, str]:
         raise BedrockServiceError("Bedrock request failed")
 
 
