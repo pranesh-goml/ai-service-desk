@@ -63,6 +63,7 @@ class TestGetAllTickets:
             ),
         ],
     )
+    #happy
     async def test_get_all_tickets_success(
         self,
         status,
@@ -92,6 +93,7 @@ class TestGetAllTickets:
             [],
         ],
     )
+    #edge
     async def test_get_all_tickets_empty(self, repo_result):
         repo = AsyncMock()
         repo.get_all.return_value = repo_result
@@ -114,6 +116,7 @@ class TestGetAllTickets:
             RuntimeError("Unexpected Error"),
         ],
     )
+    #failure
     async def test_get_all_tickets_repository_exception(self, exception):
         repo = AsyncMock()
         repo.get_all.side_effect = exception

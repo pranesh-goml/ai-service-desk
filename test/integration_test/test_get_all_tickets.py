@@ -29,6 +29,7 @@ class TestGetAllTickets:
             ]
         ],
     )
+    #happy
     async def test_get_all_tickets(
         self,
         client: AsyncClient,
@@ -57,6 +58,7 @@ class TestGetAllTickets:
         assert isinstance(data, list)
         assert len(data) >= len(tickets)
 
+    #edge
     async def test_get_all_tickets_empty(
         self,
         client: AsyncClient,
@@ -74,6 +76,7 @@ class TestGetAllTickets:
             StatusEnum.RESOLVED.value,
         ],
     )
+    #happy
     async def test_filter_by_status(
         self,
         client: AsyncClient,
@@ -96,6 +99,7 @@ class TestGetAllTickets:
             PriorityEnum.LOW.value,
         ],
     )
+    #happy
     async def test_filter_by_priority(
         self,
         client: AsyncClient,
@@ -127,6 +131,7 @@ class TestGetAllTickets:
             ),
         ],
     )
+    #happy
     async def test_filter_by_status_and_priority(
         self,
         client: AsyncClient,
@@ -151,6 +156,7 @@ class TestGetAllTickets:
             "completed",
         ],
     )
+    #failure
     async def test_invalid_status_filter(
         self,
         client: AsyncClient,
@@ -170,6 +176,7 @@ class TestGetAllTickets:
             "unknown",
         ],
     )
+    #failure
     async def test_invalid_priority_filter(
         self,
         client: AsyncClient,

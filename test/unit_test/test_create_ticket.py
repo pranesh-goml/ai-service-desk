@@ -29,6 +29,7 @@ class TestCreateTicket:
             ),
         ],
     )
+    #happy
     async def test_create_ticket_success(self, payload):
         repo = AsyncMock()
         repo.get_ticket_by_title.return_value = None
@@ -48,6 +49,7 @@ class TestCreateTicket:
             RuntimeError("Unexpected Error"),
         ],
     )
+    #failure
     async def test_create_ticket_exception(self, exception):
         payload = TicketInSchema(
             title="Laptop Issue",
@@ -79,6 +81,7 @@ class TestCreateTicket:
             ),
         ],
     )
+    #edge
     async def test_create_ticket_invalid_status_raises_http_exception(self, payload):
         repo = AsyncMock()
         repo.get_ticket_by_title.return_value = None

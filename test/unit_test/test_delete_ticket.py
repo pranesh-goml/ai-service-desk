@@ -16,6 +16,7 @@ class TestDeleteTicket:
             {"message": "Ticket deleted successfully"},
         ],
     )
+    #happy
     async def test_delete_ticket_success(self, repo_result):
         ticket_id = uuid.uuid4()
 
@@ -38,6 +39,7 @@ class TestDeleteTicket:
             False,
         ],
     )
+    #edge
     async def test_delete_ticket_not_found(self, repo_result):
         ticket_id = uuid.uuid4()
 
@@ -59,6 +61,7 @@ class TestDeleteTicket:
             RuntimeError("Unexpected Error"),
         ],
     )
+    #failure
     async def test_delete_ticket_repository_exception(self, exception):
         ticket_id = uuid.uuid4()
 

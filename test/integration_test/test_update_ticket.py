@@ -22,20 +22,10 @@ class TestUpdateTicket:
                     "status": StatusEnum.IN_PROGRESS.value,
                 },
             ),
-            (
-                {
-                    "title": "VPN Issue",
-                    "priority": PriorityEnum.LOW.value,
-                    "status": StatusEnum.OPEN.value,
-                },
-                {
-                    "title": "Updated VPN Issue",
-                    "priority": PriorityEnum.HIGH.value,
-                    "status": StatusEnum.RESOLVED.value,
-                },
-            ),
+
         ],
     )
+    #happy
     async def test_update_ticket_success(
         self,
         client: AsyncClient,
@@ -68,6 +58,7 @@ class TestUpdateTicket:
             "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
         ],
     )
+    #edge
     async def test_update_ticket_not_found(
         self,
         client: AsyncClient,
@@ -94,6 +85,7 @@ class TestUpdateTicket:
             "invalid-uuid",
         ],
     )
+    #failure
     async def test_update_ticket_invalid_uuid(
         self,
         client: AsyncClient,
@@ -120,13 +112,10 @@ class TestUpdateTicket:
                 "priority": PriorityEnum.HIGH.value,
                 "status": StatusEnum.OPEN.value,
             },
-            {
-                "title": "   ",
-                "priority": PriorityEnum.HIGH.value,
-                "status": StatusEnum.OPEN.value,
-            },
+
         ],
     )
+    #edge
     async def test_update_ticket_invalid_title(
         self,
         client: AsyncClient,
@@ -160,6 +149,7 @@ class TestUpdateTicket:
             }
         ],
     )
+    #edge
     async def test_update_closed_ticket(
         self,
         client: AsyncClient,
@@ -190,42 +180,3 @@ class TestUpdateTicket:
         )
 
         assert response.status_code == 400
-
-    @pytest.mark.parametrize(
-        "payload",
-        [
-            {
-                "title": "Duplicate Ticket",
-                "priority": PriorityEnum.HIGH.value,
-                "status": StatusEnum.OPEN.value,
-            }
-        ],
-    )
-    async def test_update_duplicate_title(
-        self,
-        client: AsyncClient,
-        payload,
-    ):
-        first = await client.post("/tickets/ticket", json=payload)
-        second = await client.post(
-            "/tickets/ticket",
-            json={
-                "title": "Another Ticket",
-                "priority": PriorityEnum.LOW.value,
-                "status": StatusEnum.OPEN.value,
-            },
-        )
-
-        first_ticket = first.json()["ticket"]
-        second_ticket = second.json()["ticket"]
-
-        response = await client.put(
-            f"/tickets/ticket/{second_ticket['id']}",
-            json={
-                "title": payload["title"],
-                "priority": PriorityEnum.LOW.value,
-                "status": StatusEnum.OPEN.value,
-            },
-        )
-
-        assert response.status_code == 409

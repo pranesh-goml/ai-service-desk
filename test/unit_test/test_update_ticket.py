@@ -31,23 +31,24 @@ class TestUpdateTicket:
             ),
         ],
     )
+    #happy
     async def test_update_ticket_success(self, payload):
-        ticket_id = uuid.uuid4()
+         ticket_id = uuid.uuid4()
 
-        repo = AsyncMock()
-        mock_ticket = AsyncMock()
-        mock_ticket.status = StatusEnum.OPEN
-        repo.get_ticket_by_id.return_value = mock_ticket
-        repo.get_ticket_by_title_exclude_id.return_value = None
-        repo.update_ticket.return_value = payload
+         repo = AsyncMock()
+         mock_ticket = AsyncMock()
+         mock_ticket.status = StatusEnum.OPEN
+         repo.get_ticket_by_id.return_value = mock_ticket
+         repo.get_ticket_by_title_exclude_id.return_value = None
+         repo.update_ticket.return_value = payload
 
-        service = TicketService(repo)
+         service = TicketService(repo)
 
-        result = await service.update_ticket(ticket_id, payload)
+         result = await service.update_ticket(ticket_id, payload)
 
-        repo.get_ticket_by_id.assert_awaited_once_with(ticket_id)
-        repo.update_ticket.assert_awaited_once_with(mock_ticket, payload)
-        assert result == payload
+         repo.get_ticket_by_id.assert_awaited_once_with(ticket_id)
+         repo.update_ticket.assert_awaited_once_with(mock_ticket, payload)
+         assert result == payload
 
     @pytest.mark.parametrize(
         "repo_result",
@@ -55,25 +56,26 @@ class TestUpdateTicket:
             None,
         ],
     )
+    #edge
     async def test_update_ticket_not_found(self, repo_result):
-        ticket_id = uuid.uuid4()
+         ticket_id = uuid.uuid4()
 
-        payload = TicketUpdateSchema(
-            title="Does Not Exist",
-            priority=PriorityEnum.HIGH,
-            status=StatusEnum.OPEN,
-        )
+         payload = TicketUpdateSchema(
+             title="Does Not Exist",
+             priority=PriorityEnum.HIGH,
+             status=StatusEnum.OPEN,
+         )
 
-        repo = AsyncMock()
-        repo.get_ticket_by_id.return_value = None
+         repo = AsyncMock()
+         repo.get_ticket_by_id.return_value = None
 
-        service = TicketService(repo)
+         service = TicketService(repo)
 
-        result = await service.update_ticket(ticket_id, payload)
+         result = await service.update_ticket(ticket_id, payload)
 
-        repo.get_ticket_by_id.assert_awaited_once_with(ticket_id)
-        repo.update_ticket.assert_not_called()
-        assert result is None
+         repo.get_ticket_by_id.assert_awaited_once_with(ticket_id)
+         repo.update_ticket.assert_not_called()
+         assert result is None
 
     @pytest.mark.parametrize(
         "exception",
@@ -82,6 +84,7 @@ class TestUpdateTicket:
             RuntimeError("Unexpected Error"),
         ],
     )
+    #failure
     async def test_update_ticket_repository_exception(self, exception):
         ticket_id = uuid.uuid4()
 

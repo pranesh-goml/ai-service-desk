@@ -22,6 +22,7 @@ class TestDeleteTicket:
             },
         ],
     )
+    #happy
     async def test_delete_ticket_success(
         self,
         client: AsyncClient,
@@ -53,6 +54,7 @@ class TestDeleteTicket:
             "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
         ],
     )
+    #edge
     async def test_delete_ticket_not_found(
         self,
         client: AsyncClient,
@@ -71,6 +73,7 @@ class TestDeleteTicket:
             "",
         ],
     )
+    #failure
     async def test_delete_ticket_invalid_uuid(
         self,
         client: AsyncClient,
@@ -90,6 +93,7 @@ class TestDeleteTicket:
             }
         ],
     )
+    #edge
     async def test_deleted_ticket_cannot_be_fetched(
         self,
         client: AsyncClient,
@@ -117,6 +121,7 @@ class TestDeleteTicket:
             }
         ],
     )
+    #edge
     async def test_delete_ticket_twice(
         self,
         client: AsyncClient,

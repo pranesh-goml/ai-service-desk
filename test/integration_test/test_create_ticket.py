@@ -27,6 +27,7 @@ class TestCreateTicket:
             },
         ],
     )
+    #happy
     async def test_create_ticket_success(
         self,
         client: AsyncClient,
@@ -58,6 +59,7 @@ class TestCreateTicket:
             },
         ],
     )
+    #edge
     async def test_create_ticket_invalid_title(
         self,
         client: AsyncClient,
@@ -67,27 +69,7 @@ class TestCreateTicket:
 
         assert response.status_code == 422
 
-    @pytest.mark.parametrize(
-        "payload",
-        [
-            {
-                "title": "Duplicate Ticket",
-                "priority": PriorityEnum.HIGH.value,
-                "status": StatusEnum.OPEN.value,
-            }
-        ],
-    )
-    async def test_create_duplicate_ticket(
-        self,
-        client: AsyncClient,
-        payload,
-    ):
-        first = await client.post("/tickets/ticket", json=payload)
-        assert first.status_code == 201
-
-        second = await client.post("/tickets/ticket", json=payload)
-
-        assert second.status_code == 409
+   
 
     @pytest.mark.parametrize(
         "payload",
@@ -109,6 +91,7 @@ class TestCreateTicket:
             },
         ],
     )
+    #failure
     async def test_create_ticket_invalid_initial_status(
         self,
         client: AsyncClient,

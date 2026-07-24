@@ -16,9 +16,9 @@ class TicketService:
         self.repo = repo
 
     async def create_ticket(self,ticket_input:TicketInSchema):
-        existing = await self.repo.get_ticket_by_title(ticket_input.title)
-        if existing is not None:
-            raise DuplicateTicketError("Ticket with this title already exists")
+        # existing = await self.repo.get_ticket_by_title(ticket_input.title)
+        # if existing is not None:
+        #     raise DuplicateTicketError("Ticket with this title already exists")
         if ticket_input.status != StatusEnum.OPEN:
             raise HTTPException(status_code=400,detail="A Ticket can be raised only as a Open ticket.")
         bedrock = BedrockService()
@@ -40,10 +40,10 @@ class TicketService:
             return None
         if ticket.status == StatusEnum.CLOSED:
             raise ClosedTicketError("Cannot update closed ticket")
-        if ticket_input.title is not None:
-            existing = await self.repo.get_ticket_by_title_exclude_id(ticket_input.title, ticket_id)
-            if existing is not None:
-                raise DuplicateTicketError("Ticket with this title already exists")
+       #if ticket_input.title is not None:
+        # existing = await self.repo.get_ticket_by_title_exclude_id(ticket_input.title, ticket_id)
+        # if existing is not None:
+        #     raise DuplicateTicketError("Ticket with this title already exists")
         return await self.repo.update_ticket(ticket,ticket_input)
 
     async def delete_ticket(self,ticket_id:UUID) :

@@ -22,6 +22,7 @@ class TestGetTicket:
             },
         ],
     )
+    #happy
     async def test_get_ticket_success(
         self,
         client: AsyncClient,
@@ -61,6 +62,7 @@ class TestGetTicket:
             "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
         ],
     )
+    #edge
     async def test_get_ticket_not_found(
         self,
         client: AsyncClient,
@@ -79,6 +81,7 @@ class TestGetTicket:
             "",
         ],
     )
+    #failure
     async def test_get_ticket_invalid_uuid(
         self,
         client: AsyncClient,
@@ -98,6 +101,7 @@ class TestGetTicket:
             },
         ],
     )
+    #happy
     async def test_get_ticket_response_schema(
         self,
         client: AsyncClient,

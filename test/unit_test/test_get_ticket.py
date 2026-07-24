@@ -26,6 +26,7 @@ class TestGetTicket:
             },
         ],
     )
+    #happy
     async def test_get_ticket_success(self, repo_result):
         repo = AsyncMock()
         repo.get_ticket_by_id.return_value = repo_result
@@ -45,6 +46,7 @@ class TestGetTicket:
             None,
         ],
     )
+    #edge
     async def test_get_ticket_not_found(self, repo_result):
         repo = AsyncMock()
         repo.get_ticket_by_id.return_value = repo_result
@@ -65,6 +67,7 @@ class TestGetTicket:
             RuntimeError("Unexpected Error"),
         ],
     )
+    #failure
     async def test_get_ticket_repository_exception(self, exception):
         repo = AsyncMock()
         repo.get_ticket_by_id.side_effect = exception

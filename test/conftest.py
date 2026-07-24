@@ -8,22 +8,11 @@ import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession
 
-# ----------------------------------------------------
-# Project Root
-# ----------------------------------------------------
-
 ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR))
 
-# ----------------------------------------------------
-# Test Environment
-# ----------------------------------------------------
 
 os.environ["ENV_FILE"] = ".env.test"
-
-# ----------------------------------------------------
-# Application Imports
-# ----------------------------------------------------
 
 from app.main import app
 from app.core.deps import get_db
@@ -47,9 +36,6 @@ def setup_test_db():
             
     asyncio.run(_teardown())
 
-# ----------------------------------------------------
-# Database Session Fixture
-# ----------------------------------------------------
 
 @pytest_asyncio.fixture
 async def db_session() -> AsyncSession:
@@ -57,9 +43,6 @@ async def db_session() -> AsyncSession:
         yield session
         await session.rollback()
 
-# ----------------------------------------------------
-# Override get_db Dependency
-# ----------------------------------------------------
 
 @pytest_asyncio.fixture
 async def client(db_session: AsyncSession):
